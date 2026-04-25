@@ -14,22 +14,22 @@ A Python-based simulation that sends a single particle on a random path. The par
 
 1. Clone the repository:
     ```git clone https://github.com/your-username/particle_party.git
-    cd particle_party```
+    cd particle_party
 
 2. Set up a Virtual Environment (Recommended)
     ```python -m venv venv
     # On Windows:
     venv\Scripts\activate
     # On Mac/Linux:
-    source venv/bin/activate```
+    source venv/bin/activate
 
 3. Install Dependencies
-    ```pip install -r requirements.txt```
+    ```pip install -r requirements.txt
 
 4. Run the Simulation
-    ```python main.py```
+    ```python main.py
 
 ## 🚀 Usage
 
 To start the simulation, simply run the entry point script:
-```python main.py```
+```python main.py
