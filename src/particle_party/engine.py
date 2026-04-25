@@ -6,18 +6,19 @@ mpl.rcParams['toolbar'] = 'None'
 import time
 import pandas as pd
 import math
+import numpy as np
 
 
 list_data = []
-#dict_data = {}
+
 def party(particle):
 
     #list_dir = ['Up', 'Down', 'Left', 'Right']
     x0, y0 = 0, 0 # starting position
-    node_0 = tuple((x0, y0))
-    list_nodes = [node_0]
+    #node_0 = tuple((x0, y0))
+    #arr_nodes = [node_0]
+    arr_nodes = np.array([x0, y0])
     dict_party = {}
-    #dict_data[particle] = {}
     
 
     plt.ioff()  # Turn on interactive mode
@@ -29,7 +30,7 @@ def party(particle):
     ax.set_facecolor('black')
     fig.canvas.manager.set_window_title(f'Particle Party! Particle {particle}')
 
-    node_current = node_0
+    node_current = (x0, y0)
     node_num = 0
     while True:
 
@@ -38,22 +39,22 @@ def party(particle):
         
         list_options = []
         node_left = tuple((node_current[0]-1, node_current[1]))
-        if node_left not in list_nodes:
+        if node_left not in arr_nodes:
             dir = 'Left'
             list_options.append(node_left)
 
         node_right = tuple((node_current[0]+1, node_current[1]))
-        if node_right not in list_nodes:
+        if node_right not in arr_nodes:
             dir = 'Right'
             list_options.append(node_right)
 
         node_up = tuple((node_current[0], node_current[1]+1))
-        if node_up not in list_nodes:
+        if node_up not in arr_nodes:
             dir = 'Up'
             list_options.append(node_up)
 
         node_down = tuple((node_current[0], node_current[1]-1))
-        if node_down not in list_nodes:
+        if node_down not in arr_nodes:
             dir = 'Down'
             list_options.append(node_down)
 
@@ -74,7 +75,7 @@ def party(particle):
         else:
 
             new_node = tuple(random.choice(list_options))
-            list_nodes.append(new_node)
+            arr_nodes.append(new_node)
 
             new_node_x = new_node[0]
             new_node_y = new_node[1]
@@ -122,9 +123,6 @@ def party(particle):
 
     plt.ioff() # Turn off interactive mode
     plt.show() # Display the final plot (optional)
-    # df_party = pd.DataFrame(dict_party)
-    # df_party = df_party.T
-    #print(df_party)
 
 
 def statistics(list_numnodes):
@@ -136,19 +134,18 @@ def statistics(list_numnodes):
 
     print(f'Parties: {num_parties}\nMin: {min_moves}\nAvg: {avg_moves}\nMax: {max_moves}')
 
-
-#List_NumNodes = []
-parties = int(input('How many parties? '))
-for particle in range(1, parties+1):
-    party(particle=particle)
-
 df_data = pd.DataFrame(list_data)
 df_data = df_data.T
-print(df_data)
 
-#statistics(list_numnodes=List_NumNodes)
 
-# domain = list(range(1,parties+1))
-# plt.scatter(domain, List_NumNodes)
-# plt.show()
 
+# Entry Point
+def initialize():
+    parties = int(input('How many parties? '))
+    for particle in range(1, parties+1):
+        party(particle=particle)
+
+# main.py
+if __name__ == "__main__":
+    # This allows you to still run this file directly if you want
+    initialize()
