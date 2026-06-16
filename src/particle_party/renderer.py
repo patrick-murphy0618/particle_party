@@ -9,12 +9,50 @@ import time
 import pandas as pd
 import math
 import numpy as np
+import streamlit as st
 
 
 list_data = []
 
 
+# src/particle_party/renderer.py
+import streamlit as st
+import matplotlib.pyplot as plt
 
+def histogram(data):
+    """
+    Creates a matplotlib histogram and renders it on the Streamlit web page.
+    """
+    # 1. Your exact plotting logic remains the same
+    fig, ax = plt.subplots()
+
+    # Note: Ensure your calculation function adds the 'Move' column before this is called!
+    n, bins, patches = ax.hist(data['Move'], bins=50, density=True, color='steelblue')
+
+    ax.set_title('Probability Distribution')
+    ax.set_xlabel('Moves')
+    ax.set_ylabel('Probability')
+
+    # 2. Swap out plt.show() for Streamlit's canvas renderer
+    st.pyplot(fig)
+
+
+def render_visuals(enriched_df):
+    """
+    The main layout hub that engine.py calls to build the web page.
+    """
+    st.title("Particle Party Tracker 🎉")
+    st.write("Live visualization dashboard for particle coordinate analysis.")
+
+    # Display the table view of your dataframe
+    st.subheader("Current Particle Metrics")
+    st.dataframe(enriched_df) 
+
+    # Display your custom histogram
+    st.subheader("Move Probability Density")
+    histogram(enriched_df)
+
+'''
 # x-axis = bins, y-axis = probability density
 def histogram(data):
 
@@ -28,7 +66,7 @@ def histogram(data):
 
     plt.show()
 
-
+'''
 
 # x-axis = Move #, y-axis = Linear Distance from Origin
 def linear_distance_from_origin(data):

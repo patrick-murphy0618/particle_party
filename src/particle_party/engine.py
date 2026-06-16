@@ -8,13 +8,18 @@ from src.particle_party.analysis import get_data
 import sys
 #import time
 #import numpy as np
+import streamlit as st
+
+# 1. Add the web title and a brief description
+st.title("Particle Party Tracker 🎉")
+st.write("Configure your simulation parameters below and launch the party!")
 
 # conductor function (calls parties, then calls get_data to perform analysis on the data created by parties))
-def run_particle_party():
+def run_particle_party(num_parties):
 
     dict_user_input = {}
 
-    num_parties = int(input('How many parties? ')) #prompt user for number of parties (runs)
+    #num_parties = int(input('How many parties? ')) #prompt user for number of parties (runs)
     if num_parties > max_parties:
         print(f"Too many parties! Max of {max_parties}")
         sys.exit()
@@ -39,11 +44,20 @@ def parties(user_input):
 
     dict_parties = {} # ALL data
 
+    # 1. BEFORE your loop starts, initialize the progress bar
+    progress_bar = st.progress(0)
+
     # Run each party (calls particle_path, creates dataframe)
     for party in range(1, parties+1):
 
         per = int(round((party/parties)*100,0))
         print(f"Tracking path data: Progress...{per}%", end="\r", flush=True)
+        
+        # 2. Calculate a float between 0.0 and 1.0 for Streamlit's progress bar
+        progress_float = (party) / parties
+        
+        # 3. Update the bar in real time
+        progress_bar.progress(progress_float)
         
         # Set initial conditions (starting position)
         x0, y0 = 0, 0 # starting position
@@ -106,7 +120,3 @@ def particle_path(visited_nodes):
     return visited_nodes # This is a list of tuples
         
 
-# main.py (calls run_particle_party)
-if __name__ == "__main__":
-    # This allows you to still run this file directly if you want
-    run_particle_party()
