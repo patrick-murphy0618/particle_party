@@ -1,151 +1,112 @@
+# engine.py
 
+# imports
+from src.particle_party.config import*
 import random
-import matplotlib.pyplot as plt
-import matplotlib as mpl
-mpl.rcParams['toolbar'] = 'None'
-import time
 import pandas as pd
-import math
-import numpy as np
+from src.particle_party.analysis import get_data
+import sys
+#import time
+#import numpy as np
 
+# conductor function (calls parties, then calls get_data to perform analysis on the data created by parties))
+def run_particle_party():
 
-list_data = []
+    dict_user_input = {}
 
-def party(particle):
+    num_parties = int(input('How many parties? ')) #prompt user for number of parties (runs)
+    if num_parties > max_parties:
+        print(f"Too many parties! Max of {max_parties}")
+        sys.exit()
 
-    #list_dir = ['Up', 'Down', 'Left', 'Right']
-    x0, y0 = 0, 0 # starting position
-    #node_0 = tuple((x0, y0))
-    #arr_nodes = [node_0]
-    arr_nodes = np.array([x0, y0])
-    dict_party = {}
+    dict_user_input['num_parties'] = num_parties
+
+    # run parties to create data
+    print(f"\nThe particles have arrived at the parties!")
     
+    df_parties = parties(dict_user_input)
+    print(f"\nDone!")
 
-    plt.ioff()  # Turn on interactive mode
+    # analysis gets dataframe
+    get_data(data=df_parties)
 
-    fig, ax = plt.subplots()
 
-    x_data, y_data = [], []
-    line, = ax.plot(x_data, y_data, 'r-')
-    ax.set_facecolor('black')
-    fig.canvas.manager.set_window_title(f'Particle Party! Particle {particle}')
+# main function that creates data (calls particle_path for each party, creates dataframe of all parties and their moves))
+def parties(user_input):
+    
+    # extract user inputs
+    parties = user_input['num_parties']
 
-    node_current = (x0, y0)
-    node_num = 0
+    dict_parties = {} # ALL data
+
+    # Run each party (calls particle_path, creates dataframe)
+    for party in range(1, parties+1):
+
+        per = int(round((party/parties)*100,0))
+        print(f"Tracking path data: Progress...{per}%", end="\r", flush=True)
+        
+        # Set initial conditions (starting position)
+        x0, y0 = 0, 0 # starting position
+
+        # main loop
+        list_visited_nodes = particle_path(visited_nodes=[(x0, y0)]) # returns a list of tuples
+        dict_parties[party] = list_visited_nodes
+        
+    # Create a dictionary of Series, then concat
+    df_parties = pd.concat({party: pd.Series(moves, name="Node") for party, moves in dict_parties.items()}, axis=0)
+
+    # Name the index levels for clarity
+    df_parties.index.names = ['Party', 'Move']
+
+    # Convert Series to DataFrame if you prefer the look
+    df_parties = df_parties.to_frame()
+    
+    return df_parties
+    
+    
+# particle path (returns dict_path, a dictionary of all of the particles moves during the party)
+def particle_path(visited_nodes):
+    
+    if len(visited_nodes) == 1:
+        move = 0
+    
+    current_node = visited_nodes[move]
+
+
     while True:
 
-        if node_num == 0:
-            plt.plot(x0, y0, marker='H', markersize=8, color='dodgerblue')
-        
-        list_options = []
-        node_left = tuple((node_current[0]-1, node_current[1]))
-        if node_left not in arr_nodes:
-            dir = 'Left'
-            list_options.append(node_left)
+        current_x, current_y = current_node[0], current_node[1]
 
-        node_right = tuple((node_current[0]+1, node_current[1]))
-        if node_right not in arr_nodes:
-            dir = 'Right'
-            list_options.append(node_right)
+        node_neg_x = (current_x-1, current_y) # Check if particle has already been to the node in the -x direction
+        node_pos_x = (current_x+1, current_y) # Check if particle has already been to the node in the +x direction
+        node_neg_y = (current_x, current_y-1) # Check if particle has already been to the node in the -y direction
+        node_pos_y = (current_x, current_y+1) # Check if particle has already been to the node in the +y direction
 
-        node_up = tuple((node_current[0], node_current[1]+1))
-        if node_up not in arr_nodes:
-            dir = 'Up'
-            list_options.append(node_up)
+        surrounding_nodes = [node_neg_x, node_neg_y, node_pos_x, node_pos_y]
 
-        node_down = tuple((node_current[0], node_current[1]-1))
-        if node_down not in arr_nodes:
-            dir = 'Down'
-            list_options.append(node_down)
+        set_visited_nodes = set(visited_nodes)
 
+        # Rebuild B, keeping only items NOT in A
+        available_nodes = [item for item in surrounding_nodes if tuple(item) not in set_visited_nodes]
 
-        num_options = int(len(list_options))
-        if num_options == 0:
-
-            #List_NumNodes.append(node_num)
-            plt.plot(node_current[0], node_current[1], marker='X', markersize=8, color='red')
-            fig.canvas.draw()
-            fig.canvas.flush_events() # Process GUI events
-            
-            #print(f'Partys Over! Moves: {node_num}')
-            time.sleep(1)
-            plt.close()
+        # is the party over?
+        num_options = int(len(available_nodes)) # How many positions can the particle move to?
+        if num_options == 0: # No place to move!
             break
             
-        else:
+        else: # The particle has option(s) to move
 
-            new_node = tuple(random.choice(list_options))
-            arr_nodes.append(new_node)
+            new_node = random.choice(available_nodes) # Pick a random direction from the possible options
+            visited_nodes.append(new_node)
 
-            new_node_x = new_node[0]
-            new_node_y = new_node[1]
-            if new_node_x > 0 and new_node_y > 0:
-                quad = 1
-            elif new_node_x < 0 and new_node_y > 0:
-                quad = 2
-            elif new_node_x < 0 and new_node_y < 0:
-                quad = 3
-            elif new_node_x > 0 and new_node_y < 0:
-                quad = 4
-            else:
-                quad = 0
-            
-           
+        current_node = new_node
+        move = move+1
 
-            current_x, current_y = node_current[0], node_current[1]
-            new_x, new_y = new_node[0], new_node[1]
+    # returns all moves the particle made during the party (this is the particles path)
+    return visited_nodes # This is a list of tuples
+        
 
-            dist_from_origin = math.sqrt(new_y**2+new_x**2)
-
-            dict_party[node_num] = {'current node': node_current, 'options': num_options, 'direction': dir, 'new node': new_node, 'quadrant': quad, 'distance': dist_from_origin}
-            list_data.append(dict_party)
-
-            plt.plot(new_x, new_y, marker='o', markersize=4, color='white')
-            plt.plot([current_x, new_x], [current_y, new_y], color='lime', linestyle='-', linewidth=2)
-            
-
-            # Update the plot line
-            line.set_xdata(x_data)
-            line.set_ydata(y_data)
-
-            # Rescale axes if needed (optional)
-            ax.relim()
-            ax.autoscale_view()
-
-            # Redraw the canvas
-            fig.canvas.draw()
-            fig.canvas.flush_events() # Process GUI events
-
-            plt.pause(.0001) # Pause for a short duration to see the update
-
-        node_current = new_node
-        node_num = node_num+1
-
-    plt.ioff() # Turn off interactive mode
-    plt.show() # Display the final plot (optional)
-
-
-def statistics(list_numnodes):
-
-    num_parties = len(list_numnodes)
-    max_moves = max(list_numnodes)
-    min_moves = min(list_numnodes)
-    avg_moves = int(sum(list_numnodes)/num_parties)
-
-    print(f'Parties: {num_parties}\nMin: {min_moves}\nAvg: {avg_moves}\nMax: {max_moves}')
-
-df_data = pd.DataFrame(list_data)
-df_data = df_data.T
-
-
-
-# Entry Point
-def initialize():
-    parties = int(input('How many parties? '))
-    for particle in range(1, parties+1):
-        party(particle=particle)
-
-# main.py
+# main.py (calls run_particle_party)
 if __name__ == "__main__":
     # This allows you to still run this file directly if you want
-    initialize()
+    run_particle_party()
