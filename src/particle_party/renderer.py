@@ -19,7 +19,7 @@ list_data = []
 import streamlit as st
 import matplotlib.pyplot as plt
 
-def histogram(data):
+def histogram(data, num_parties):
     """
     Creates a matplotlib histogram and renders it on the Streamlit web page.
     """

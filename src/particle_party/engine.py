@@ -29,7 +29,7 @@ def run_particle_party(num_parties):
     print(f"\nDone!")
 
     # analysis gets dataframe
-    get_data(data=df_parties)
+    get_data(data=df_parties, num_parties=num_parties)
 
 
 # main function that creates data (calls particle_path for each party, creates dataframe of all parties and their moves))

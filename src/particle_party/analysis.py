@@ -8,22 +8,11 @@ import pandas as pd
 import numpy as np
 from src.particle_party.renderer import *
 
-'''
-How the project will look:
-- Title and description of the project
-- User input space (number of parties)
-- Run button (calls run_particle_party)
-- Live view of the party (shows particle in motion, leaves a trail of where it's been)
-- Final statistical analysis and visualizations:
-    - Histogram
-    - Distance from origin (line graph)
-'''
-
 
 sns.set_theme(style="ticks")
 
 # get data from run_particle_party
-def get_data(data):
+def get_data(data, num_parties):
 
     df_parties = data
 
@@ -33,27 +22,48 @@ def get_data(data):
     print('----------------------------------------------------------------------------')
     
     # perform analysis
-    analysis_manager(df_parties)
+    analysis_manager(df_parties, num_parties)
     
 
 '''
-- Main analysis function (calls specific functions that perform calculations of creates visualsizations)
-- This function acts as a manager that organizes the flow of analysis, and can be easily modified to add or
-    remove specific analyses or visualizations.
-- It also collects the results of different analyses into a dictionary
-    for easy access and potential use in visualizations or further calculations.
+
+    
+
+    # Basic Statistics:
+    dict_basic_analysis = basic_analysis(data=pvt_moves_per_party)
+
+
+    # Advanced Analysis & Calculations:
+    df_data_with_distance, move_average_distance = distance_from_origin(df_parties)
+    #print(df_data_with_distance)
+    df_area_density = area_density(df_parties)
+
+
+    # Visualizations (called from renderer.py):
+    #scatter_plot(data=pvt_moves_per_party)
+    histogram(data=pvt_moves_per_party)
+    #linear_distance_from_origin(data=df_data_with_distance)
+
+    dict_data = {'pvt_moves_per_party': pvt_moves_per_party,
+                 'df_data_with_distance': df_data_with_distance,
+                 'move_average_distance': move_average_distance
+                 }
+    
+    combined(dict_data)
+
+    
 - Consists of Calculation functions (e.g. distance_from_origin) and Visualization functions (e.g. histogram).
     The calculation functions perform specific data manipulations or calculations, while the visualization
     functions create plots based on the data.
 '''
-def analysis_manager(df_parties):
+def analysis_manager(df_parties, num_parties):
 
 
     # Pivot Tables:
     pvt_moves_per_party = moves_per_party(data=df_parties)
 
     # Visualizations (called from renderer.py)
-    histogram(data=pvt_moves_per_party)
+    histogram(data=pvt_moves_per_party, num_parties=num_parties)
 
     #df_data_with_distance = distance_from_origin(data=df_parties)
     #linear_distance_from_origin(data=df_data_with_distance)
