@@ -37,36 +37,46 @@ def histogram(data):
     st.pyplot(fig)
 
 
-def render_visuals(enriched_df):
-    """
-    The main layout hub that engine.py calls to build the web page.
-    """
-    st.title("Particle Party Tracker 🎉")
-    st.write("Live visualization dashboard for particle coordinate analysis.")
 
-    # Display the table view of your dataframe
-    st.subheader("Current Particle Metrics")
-    st.dataframe(enriched_df) 
 
-    # Display your custom histogram
-    st.subheader("Move Probability Density")
-    histogram(enriched_df)
+def create_path_canvas():
+    """Creates a dedicated title and blank slot for the live path tracking."""
+    st.subheader("Live Particle Trajectory 🗺️")
+    path_slot = st.empty()
+    return path_slot
 
-'''
-# x-axis = bins, y-axis = probability density
-def histogram(data):
+def update_live_path(path_slot, data):
+    """Draws a connected scatter plot of the particle's history."""
+    if len(data) == 0:
+        return
+
+    # 1. Unpack the (X, Y) tuple pairs from your 'Node' column
+    x_coords = [loc[0] for loc in data['Node']]
+    y_coords = [loc[1] for loc in data['Node']]
 
     fig, ax = plt.subplots()
 
-    n, bins, patches = ax.hist(data['Move'], bins=50, density=True, color='steelblue')
+    # 2. DRAW THE CONNECTED PATH:
+    # ax.plot draws the connecting lines between the history points
+    ax.plot(x_coords, y_coords, color='lightblue', linestyle='-', linewidth=1.5, zorder=1)
+    
+    # ax.scatter draws the individual points (making the latest point red and bigger)
+    ax.scatter(x_coords[:-1], y_coords[:-1], color='steelblue', s=15, zorder=2) 
+    ax.scatter(x_coords[-1], y_coords[-1], color='crimson', s=50, marker='o', zorder=3, label='Current Pos')
 
-    ax.set_title('Probability Distribution')
-    ax.set_xlabel('Moves')
-    ax.set_ylabel('Probability')
+    # Styling the arena
+    ax.set_title('Particle Path History')
+    ax.set_xlabel('X Coordinate')
+    ax.set_ylabel('Y Coordinate')
+    ax.grid(True, linestyle=':', alpha=0.6)
+    ax.legend(loc='upper left')
 
-    plt.show()
+    # 3. Send it to the live slot and clean up memory
+    path_slot.pyplot(fig)
+    plt.close(fig)
 
-'''
+
+
 
 # x-axis = Move #, y-axis = Linear Distance from Origin
 def linear_distance_from_origin(data):

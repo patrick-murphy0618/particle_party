@@ -1,6 +1,6 @@
 # 🥳 Particle Party
 
-A Python-based simulation that sends a single particle on a random path. The particle continues its party until it becomes trapped by its own path. **Party on!**
+A Python-based Monte Carlo simulation that sends a single particle on a random path. The particle continues its party until it becomes trapped by its own path. **Party on!**
 
 ![Particle Party Animation](path/to/your/placeholder_image.gif)
 
