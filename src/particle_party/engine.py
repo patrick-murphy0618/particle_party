@@ -10,10 +10,6 @@ import sys
 #import numpy as np
 import streamlit as st
 
-# 1. Add the web title and a brief description
-st.title("Particle Party Tracker 🎉")
-st.write("Configure your simulation parameters below and launch the party!")
-
 # conductor function (calls parties, then calls get_data to perform analysis on the data created by parties))
 def run_particle_party(num_parties):
 
