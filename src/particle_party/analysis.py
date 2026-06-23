@@ -62,6 +62,9 @@ def analysis_manager(df_parties, num_parties):
     # Pivot Tables:
     pvt_moves_per_party = moves_per_party(data=df_parties)
 
+    path_slot = create_path_canvas()
+    update_live_path(path_slot=path_slot, data=df_parties)
+
     # Visualizations (called from renderer.py)
     histogram(data=pvt_moves_per_party, num_parties=num_parties)
 
