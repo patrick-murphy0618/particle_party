@@ -63,7 +63,19 @@ def analysis_manager(df_parties, num_parties):
     pvt_moves_per_party = moves_per_party(data=df_parties)
 
     path_slot = create_path_canvas()
-    update_live_path(path_slot=path_slot, data=df_parties)
+    for i in range(1, len(df_parties) + 1):
+        # Slice the dataframe to grab history up to the current point
+        current_history = df_parties.iloc[:i]
+        
+        # Update the exact same layout slot with the new figure
+        update_live_path(path_slot, current_history)
+        
+        # Pause for 0.2 seconds before the next point
+        time.sleep(0.2)
+
+
+    
+    #update_live_path(path_slot=path_slot, data=df_parties)
 
     # Visualizations (called from renderer.py)
     histogram(data=pvt_moves_per_party, num_parties=num_parties)
